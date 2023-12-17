@@ -17,11 +17,11 @@ const definitionUsagers = [
   { nom: "Guy Guay", age: 3 }
 ];
 
-const Usagers = ({definitionUsagers}) =>{
+const Usagers = ({definitionUsagers, functionOnClick}) =>{
   return(
-      definitionUsagers.map((Usager) => 
-        <h4>
-          <BsX className='bg-danger m-2 border border-dark rounded text-white' />
+      definitionUsagers.map((Usager, index) => 
+        <h4 key={index}>
+          <BsX onClick={() => functionOnClick(index)} className='bg-danger m-2 border border-dark rounded text-white' />
           {Usager.nom} ({Usager.age})
         </h4>
       )
@@ -45,6 +45,12 @@ export function Billeterie() {
     nouvelleListeUsager.push(usager);
     setlisteUsager(nouvelleListeUsager);
     event.preventDefault();
+  }
+
+  const retirerUsager = (index) => {
+    const nouvelleListeUsager = listeUsager.slice();
+    nouvelleListeUsager.splice(index, 1);
+    setlisteUsager(nouvelleListeUsager);
   }
 
   return (
@@ -79,7 +85,7 @@ export function Billeterie() {
       <Row>
         <Col className="border border-dark rounded shadow my-3">
           <h2>Usagers</h2>
-          <Usagers definitionUsagers={listeUsager}/>
+          <Usagers definitionUsagers={listeUsager} functionOnClick={retirerUsager}/>
         </Col>
       </Row>
       <Row>

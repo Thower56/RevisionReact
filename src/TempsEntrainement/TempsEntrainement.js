@@ -6,6 +6,7 @@ import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Form from 'react-bootstrap/Form';
+import React, { useState } from 'react';
 
 const entrainements = [
   {
@@ -45,7 +46,75 @@ const entrainements = [
   },
 ];
 
+
+
 export function TempsEntrainement() {
+  const [joursDentrainements, setJours] = useState(entrainements);
+  const [Activite, setActivite] = useState(joursDentrainements[0].sport);
+  const [Minutes, setMinutes] = useState(joursDentrainements[0].duree);
+  const [selectedDay, setSelectedDay] = useState(joursDentrainements[0]);
+  console.log({selectedDay});
+  console.log(selectedDay.jour);
+  const JourDeLaSemaine = () => {
+    return(
+      joursDentrainements.map((semaine) => 
+        <ListGroup.Item
+        onClick={() => 
+          {
+            setSelectedDay(semaine);
+            setActivite(semaine.sport);
+            setMinutes(semaine.duree);
+          }}
+        className={semaine.jour == selectedDay.jour ? 'active' : ''}
+        >
+          {semaine.jour}</ListGroup.Item>
+      )
+    )
+  }
+
+  const FormJourChoisie = () => {
+    const entrainement = joursDentrainements.filter(entrainement => entrainement.jour == selectedDay.jour);
+    return(
+      <>
+        <h3>{entrainement.jour}</h3>
+          <Form>
+            <Form.Group>
+              <Form.Label>Activité</Form.Label>
+              <Form.Control as="select" custom defaultValue={Activite} onChange={activite => setActivite(activite.target.value)}>
+                <option value="course">Course</option>
+                <option value="velo">Vélo</option>
+                <option value="natation">Natation</option>
+                <option value="repos">Repos</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Minutes</Form.Label>
+              <Form.Control type="number" value={Minutes} onChange={minute => setMinutes(parseInt(minute.target.value))}/>
+            </Form.Group>
+          </Form>
+      </>
+    )
+  }
+
+  const Sauvegarder = (event) => {
+    const nouvelleListeEntrainement = joursDentrainements.map(entraiment => {
+      if (entraiment.jour == selectedDay.jour) {
+
+        if(Activite == "repos"){
+          return { ...entraiment, sport: Activite, duree: 0 };
+        }
+        else return { ...entraiment, sport: Activite, duree: Minutes };
+        
+      }
+      
+      else {
+        return entraiment;
+      }
+    });
+    setJours(nouvelleListeEntrainement);
+    event.preventDefault();
+  }
+
   return (
     <Container>
       <Row>
@@ -59,33 +128,12 @@ export function TempsEntrainement() {
       <Row>
         <Col>
           <ListGroup>
-            <ListGroup.Item>Dimanche</ListGroup.Item>
-            <ListGroup.Item>Lundi</ListGroup.Item>
-            <ListGroup.Item>Mardi</ListGroup.Item>
-            <ListGroup.Item>Mercredi</ListGroup.Item>
-            <ListGroup.Item active>Jeudi</ListGroup.Item>
-            <ListGroup.Item>Vendredi</ListGroup.Item>
-            <ListGroup.Item>Samedi</ListGroup.Item>
+            <JourDeLaSemaine entrainements={entrainements}/>
           </ListGroup>
         </Col>
         <Col>
-          <h3>Jeudi</h3>
-          <Form>
-            <Form.Group>
-              <Form.Label>Activité</Form.Label>
-              <Form.Control as="select" custom>
-                <option>Course</option>
-                <option>Vélo</option>
-                <option>Natation</option>
-                <option>Repos</option>
-              </Form.Control>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Minutes</Form.Label>
-              <Form.Control type="number" value="20" />
-            </Form.Group>
-          </Form>
-          <Button>
+          <FormJourChoisie/>
+          <Button onClick={Sauvegarder}>
             Sauvegarder
           </Button>
         </Col>
